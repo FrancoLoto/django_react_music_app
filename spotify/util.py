@@ -8,6 +8,7 @@ from requests import post, put, get
 BASE_URL = "https://api.spotify.com/v1/me/"
 
 
+# Obtiene los tokens de acceso y de refresco del usuario
 def get_user_tokens(session_id):
     user_tokens = SpotifyToken.objects.filter(user=session_id)
 
@@ -17,6 +18,7 @@ def get_user_tokens(session_id):
         return None
 
 
+# Actualiza o crea los tokens de acceso y refresco del usuario
 def update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token):
     tokens = get_user_tokens(session_id)
     expires_in = timezone.now() + timedelta(seconds=expires_in)
@@ -34,6 +36,7 @@ def update_or_create_user_tokens(session_id, access_token, token_type, expires_i
         tokens.save()
 
 
+# Verifica si el usuario está autenticado con Spotify y actualiza el token si es necesario
 def is_spotify_authenticated(session_id):
     tokens = get_user_tokens(session_id)
     if tokens:
@@ -46,6 +49,7 @@ def is_spotify_authenticated(session_id):
     return False
 
 
+# Refresca el token de acceso de Spotify utilizando el token de refresco
 def refresh_spotify_token(session_id):
     refresh_token = get_user_tokens(session_id).refresh_token
 
@@ -64,6 +68,7 @@ def refresh_spotify_token(session_id):
         session_id, access_token, token_type, expires_in, refresh_token)
 
 
+# Ejecuta una solicitud a la API de Spotify
 def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     tokens = get_user_tokens(session_id)
     headers = {'Content-Type': 'application/json',
@@ -81,14 +86,17 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
         return {'Error': 'Issue with request'}
 
 
+# Reproduce una canción en Spotify
 def play_song(session_id):
     return execute_spotify_api_request(session_id, "player/play", put_=True)
 
 
+# Pausa la canción actual en Spotify
 def pause_song(session_id):
     return execute_spotify_api_request(session_id, "player/pause", put_=True)
 
 
+# Salta a la siguiente canción en Spotify
 def skip_song(session_id):
     return execute_spotify_api_request(session_id, "player/next", post_=True)
 

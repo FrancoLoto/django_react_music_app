@@ -9,10 +9,12 @@ from api.models import Room
 from .models import Vote
 
 
+# Vista para obtener la URL de autenticación de Spotify
 class AuthURL(APIView):
     def get(self, request, format=None):
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
 
+        # Construye la URL de autorización de Spotify
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
             'response_type': 'code',
@@ -23,10 +25,12 @@ class AuthURL(APIView):
         return Response({"url": url}, status=status.HTTP_200_OK)
 
 
+# Vista para el callback de Spotify
 def spotify_callback(request, format=None):
     code = request.GET.get('code')
     error = request.GET.get('error')
 
+    # Intercambio del código de autorización por un token de acceso
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
         'code': code,
@@ -35,12 +39,15 @@ def spotify_callback(request, format=None):
         'client_secret': CLIENT_SECRET
     }).json()
 
+
+    # Extrae información del token de acceso
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
     error = response.get('error')
     
+    # Crea o actualiza los tokens del usuario en la sesión
     if not request.session.exists(request.session.session_key):
         request.session.create() 
 
@@ -50,12 +57,14 @@ def spotify_callback(request, format=None):
     return redirect('frontend:')
 
 
+# Vista para verificar si el usuario está autenticado con Spotify
 class IsAuthenticated(APIView):
     def get(self, request, format=None):
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
 
 
+# Vista para obtener la canción actual en una sala
 class CurrentSong(APIView):
     def get(self, request, format=None):
         room_code = self.request.session.get('room_code')
@@ -104,6 +113,7 @@ class CurrentSong(APIView):
         
         return Response(song, status=status.HTTP_200_OK)
 
+    # Actualiza la canción actual en la sala
     def update_room_song(self, room, song_id):
         current_song = room.current_song
 
@@ -112,6 +122,7 @@ class CurrentSong(APIView):
             room.save(update_fields=['current_song'])
             votes = Vote.objects.filter(room=room).delete()
 
+# Vista para pausar la canción actual
 class PauseSong(APIView):
     def put(self, response, format=None):
         room_code = self.request.session.get('room_code')
@@ -123,6 +134,7 @@ class PauseSong(APIView):
         return Response({}, status=status.HTTP_403_FORBIDDEN)
 
 
+# Vista para reproducir la canción actual
 class PlaySong(APIView):
     def put(self, response, format=None):
         room_code = self.request.session.get('room_code')
@@ -134,6 +146,7 @@ class PlaySong(APIView):
         return Response({}, status=status.HTTP_403_FORBIDDEN)
 
 
+# Vista para saltar a la siguiente canción
 class SkipSong(APIView):
     def post(self, request, format=None):
         room_code = self.request.session.get('room_code')

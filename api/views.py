@@ -6,11 +6,13 @@ from .serializers import RoomSerializer, CreateRoomSerializer, UpdateRoomSeriali
 from django.http import JsonResponse
 
 
+# Vista para obtener una lista de todas las salas
 class RoomView(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
 
+# Vista para obtener detalles de una sala específica
 class GetRoom(APIView):
     serializer_class = RoomSerializer
     lookup_url_kwarg = 'code'
@@ -28,6 +30,8 @@ class GetRoom(APIView):
         return Response({'Error de petición': 'El parámetro del código no fue encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# Vista para unirse a una sala
 class JoinRoom(APIView):
     lookup_url_kwarg = 'code'
 
@@ -48,6 +52,8 @@ class JoinRoom(APIView):
         return Response({'Bad Request': 'Invalid post data, did not find a code key'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# Vista para crear una sala
 class CreateRoomView(APIView):
     serializer_class = CreateRoomSerializer
 
@@ -78,6 +84,7 @@ class CreateRoomView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Vista para verificar si un usuario está en una sala
 class UserInRoom(APIView):
     def get(self, request, format=None):
         if not self.request.session.exists(self.request.session.session_key):
@@ -89,6 +96,7 @@ class UserInRoom(APIView):
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
+# Vista para salir de una sala
 class LeaveRoom(APIView):
     def post(self, request, format=None):
         if 'room_code' in self.request.session:
@@ -102,6 +110,7 @@ class LeaveRoom(APIView):
         return Response({'Message': 'Success'}, status=status.HTTP_200_OK)
 
 
+# Vista para actualizar la configuración de una sala
 class UpdateRoom(APIView):
     serializer_class = UpdateRoomSerializer
 

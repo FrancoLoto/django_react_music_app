@@ -2,6 +2,8 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    background: linear-gradient(70deg, #11137E, #B82D77);
+    color: white;
 }
 
 #main {
@@ -22,5 +24,14 @@ html, body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.votes {
+    padding: 12px;
+    font-size: medium;
+}
+
+.reproductor {
+    margin: 20px;
 }
 

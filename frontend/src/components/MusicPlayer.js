@@ -44,7 +44,7 @@ export default class MusicPlayer extends Component {
     const songProgress = (this.props.time / this.props.duration) * 100;
 
     return (
-      <Card>
+      <Card className="reproductor">
         <Grid container alignItems="center">
           <Grid item align="center" xs={4}>
             <img src={this.props.image_url} height="100%" width="100%" />
@@ -65,8 +65,10 @@ export default class MusicPlayer extends Component {
                 {this.props.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
               <IconButton onClick={() => this.skipSong() }>
-                {this.props.votes} / {this.props.votes_required}
                 <SkipNextIcon />
+                <span className="votes">
+                {this.props.votes} / {this.props.votes_required}
+                </span>
               </IconButton>
             </div>
           </Grid>
