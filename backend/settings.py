@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
     'api',
     'frontend',
+    'spotify',
 ]
 
 MIDDLEWARE = [
